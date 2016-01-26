@@ -1,5 +1,8 @@
 Revision history for File-Path-Tiny
 
+0.8  ???
+    - Address minor race issue
+
 0.7  2013-09-26 18:46:19
     - add =encoding to POD due to test failure on certain boxes
     - add several perl, pkg, and pod tests
