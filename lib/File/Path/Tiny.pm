@@ -17,14 +17,12 @@ sub mk {
         $progressive = File::Spec->catdir( $progressive, shift(@parts) );
     }
     if ( !-d $progressive ) {
-        mkdir( $progressive, $mask );
-        last if !-d $progressive;
+        mkdir( $progressive, $mask ) or -d $progressive or return;
     }
     for my $part (@parts) {
         $progressive = File::Spec->catdir( $progressive, $part );
         if ( !-d $progressive ) {
-            mkdir( $progressive, $mask );
-            last if !-d $progressive;
+            mkdir( $progressive, $mask ) or -d $progressive or return;
         }
     }
     return 1 if -d $path;
@@ -36,9 +34,8 @@ sub rm {
     if ( -e $path && !-d $path ) { $! = 20; return; }
     return 2 if !-d $path;
     empty_dir($path) or return;
-    rmdir($path);
-    return 1 if !-d $path;
-    return;
+    rmdir($path) or !-e $path or return;
+    return 1;
 }
 
 sub empty_dir {
@@ -51,10 +48,10 @@ sub empty_dir {
     for my $thing (@contents) {
         my $long = File::Spec->catdir( $path, $thing );
         if ( !-l $long && -d $long ) {
-            rm($long) or return;
+            rm($long) or !-e $long or return;
         }
         else {
-            unlink $long or return;
+            unlink $long or !-e $long or return;
         }
     }
     return 1;

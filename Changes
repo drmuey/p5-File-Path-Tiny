@@ -1,7 +1,7 @@
 Revision history for File-Path-Tiny
 
 0.8  ???
-    - Address minor race issue
+    - rt 88849: allow multiple processes to operate on the same paths (thanks HELENA!)
     - Add github to POD
 
 0.7  2013-09-26 18:46:19
