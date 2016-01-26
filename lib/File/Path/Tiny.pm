@@ -12,15 +12,15 @@ sub mk {
     $mask ||= '0777';    # Perl::Critic == Integer with leading zeros at ...
     $mask = oct($mask) if substr( $mask, 0, 1 ) eq '0';
     require File::Spec;
-    my ( $progressive, @parts ) = File::Spec->splitdir($path);
-    if ( !defined $progressive || $progressive eq '' ) {
-        $progressive = File::Spec->catdir( $progressive, shift(@parts) );
-    }
-    if ( !-d $progressive ) {
-        mkdir( $progressive, $mask ) or -d $progressive or return;
-    }
-    for my $part (@parts) {
-        $progressive = File::Spec->catdir( $progressive, $part );
+    my ( $vol, $directories ) = File::Spec->splitpath( $path, 1 );
+    my @dirs = File::Spec->splitdir($directories);
+    my @list;
+
+    while ( my ($_dir) = shift @dirs ) {
+        last if not defined $_dir;
+        push @list, $_dir;
+        next if ( $_dir eq '' );
+        my $progressive = File::Spec->catpath( $vol, File::Spec->catdir(@list), '' );
         if ( !-d $progressive ) {
             mkdir( $progressive, $mask ) or -d $progressive or return;
         }
