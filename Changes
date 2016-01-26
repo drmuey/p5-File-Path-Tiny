@@ -1,6 +1,6 @@
 Revision history for File-Path-Tiny
 
-0.8  ???
+0.8  2016-01-26 14:44:57
     - rt 88849: allow multiple processes to operate on the same paths (thanks HELENA!)
     - Add github to POD
     - rt 96842: Fix mk() to work correctly w/ UNC paths on windows

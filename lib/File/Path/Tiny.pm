@@ -3,7 +3,7 @@ package File::Path::Tiny;
 use strict;
 use warnings;
 
-$File::Path::Tiny::VERSION = 0.7;
+$File::Path::Tiny::VERSION = 0.8;
 
 sub mk {
     my ( $path, $mask ) = @_;
