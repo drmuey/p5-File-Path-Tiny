@@ -1,5 +1,8 @@
 Revision history for File-Path-Tiny
 
+0.9  ???
+    - rt 96843: Add SEE ALSO section
+
 0.8  2016-01-26 14:44:57
     - rt 88849: allow multiple processes to operate on the same paths (thanks HELENA!)
     - Add github to POD
