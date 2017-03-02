@@ -2,6 +2,8 @@ package File::Path::Tiny;
 
 use strict;
 use warnings;
+use Cwd qw(cwd chdir);
+use Carp ();
 
 $File::Path::Tiny::VERSION = 0.8;
 
@@ -30,21 +32,30 @@ sub mk {
 }
 
 sub rm {
-    my ($path) = @_;
+    my ( $path, $fast ) = @_;
     my ( $orig_dev, $orig_ino ) = ( lstat $path )[ 0, 1 ];
     if ( -e _ && !-d _ ) { $! = 20; return; }
     return 2 if !-d _;
 
-    empty_dir($path) or return;
+    empty_dir( $path, $fast ) or return;
     _bail_if_changed( $path, $orig_dev, $orig_ino );
     rmdir($path) or !-e $path or return;
     return 1;
 }
 
 sub empty_dir {
-    my ($path) = @_;
+    my ( $path, $fast ) = @_;
     my ( $orig_dev, $orig_ino ) = ( lstat $path )[ 0, 1 ];
     if ( -e _ && !-d _ ) { $! = 20; return; }
+
+    my ( $starting_point, $starting_dev, $starting_ino );
+    if ( !$fast ) {
+        $starting_point = cwd();
+        ( $starting_dev, $starting_ino ) = ( lstat $starting_point )[ 0, 1 ];
+        chdir($path) or Carp::croak("Failed to change directory to “$path”: $!");
+        $path = '.';
+        _bail_if_changed( $path, $orig_dev, $orig_ino );
+    }
 
     opendir( DIR, $path ) or return;
     my @contents = grep { $_ ne '.' && $_ ne '..' } readdir(DIR);
@@ -63,7 +74,13 @@ sub empty_dir {
             unlink $long or !-e $long or return;
         }
     }
+
     _bail_if_changed( $path, $orig_dev, $orig_ino );
+
+    if ( !$fast ) {
+        chdir($starting_point) or Carp::croak("Failed to change directory to “$starting_point”: $!");
+        _bail_if_changed( ".", $starting_dev, $starting_ino );
+    }
 
     return 1;
 }
@@ -89,8 +106,9 @@ sub _bail_if_changed {
 
     my ( $cur_dev, $cur_ino ) = ( lstat $path )[ 0, 1 ];
     if ( $orig_dev ne $cur_dev || $orig_ino ne $cur_ino ) {
-        require Carp;
-        Carp::croak("directory $path changed before chdir, expected dev=$orig_dev ino=$orig_ino, actual dev=$cur_dev ino=$cur_ino, aborting.");
+        local $Carp::CarpLevel += 1;
+        $path = Cwd::abs_path($path);
+        Carp::croak("directory $path changed: expected dev=$orig_dev ino=$orig_ino, actual dev=$cur_dev ino=$cur_ino, aborting");
     }
 }
 
