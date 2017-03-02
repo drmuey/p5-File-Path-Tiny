@@ -31,29 +31,40 @@ sub mk {
 
 sub rm {
     my ($path) = @_;
-    if ( -e $path && !-d $path ) { $! = 20; return; }
-    return 2 if !-d $path;
+    my ( $orig_dev, $orig_ino ) = ( lstat $path )[ 0, 1 ];
+    if ( -e _ && !-d _ ) { $! = 20; return; }
+    return 2 if !-d _;
+
     empty_dir($path) or return;
+    _bail_if_changed( $path, $orig_dev, $orig_ino );
     rmdir($path) or !-e $path or return;
     return 1;
 }
 
 sub empty_dir {
     my ($path) = @_;
-    if ( -e $path && !-d $path ) { $! = 20; return; }
+    my ( $orig_dev, $orig_ino ) = ( lstat $path )[ 0, 1 ];
+    if ( -e _ && !-d _ ) { $! = 20; return; }
+
     opendir( DIR, $path ) or return;
     my @contents = grep { $_ ne '.' && $_ ne '..' } readdir(DIR);
     closedir DIR;
+    _bail_if_changed( $path, $orig_dev, $orig_ino );
+
     require File::Spec if @contents;
     for my $thing (@contents) {
         my $long = File::Spec->catdir( $path, $thing );
         if ( !-l $long && -d $long ) {
+            _bail_if_changed( $path, $orig_dev, $orig_ino );
             rm($long) or !-e $long or return;
         }
         else {
+            _bail_if_changed( $path, $orig_dev, $orig_ino );
             unlink $long or !-e $long or return;
         }
     }
+    _bail_if_changed( $path, $orig_dev, $orig_ino );
+
     return 1;
 }
 
@@ -71,6 +82,16 @@ sub mk_parent {
 
     my $parent = File::Spec->catpath( $v, $d, $f );
     return mk( $parent, $mode );
+}
+
+sub _bail_if_changed {
+    my ( $path, $orig_dev, $orig_ino ) = @_;
+
+    my ( $cur_dev, $cur_ino ) = ( lstat $path )[ 0, 1 ];
+    if ( $orig_dev ne $cur_dev || $orig_ino ne $cur_ino ) {
+        require Carp;
+        Carp::croak("directory $path changed before chdir, expected dev=$orig_dev ino=$orig_ino, actual dev=$cur_dev ino=$cur_ino, aborting.");
+    }
 }
 
 1;

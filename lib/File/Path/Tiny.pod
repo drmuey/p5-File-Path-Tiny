@@ -76,7 +76,7 @@ It is recursive in the sense that given “foo/bar/baz” as the path to create 
 
 Takes a single path (like L<rmdir>()) to recursively empty and remove.
 
-Returns false if it could not be emptied or removed, true otherwise. (returns ‘2’ if it is !-d already)
+Returns false if it could not be emptied or removed, true otherwise (returns ‘2’ if it is !-d already). Also see L<DIAGNOSTICS>.
 
 It is recursive in the sense that given “/foo/bar/baz” as the path to remove it will recursively empty ‘baz’ and then remove it from /foo/bar.
 
@@ -84,9 +84,9 @@ Its parents, /, /foo, and /foo/bar are *not* touched.
 
 =head2 File::Path::Tiny::empty_dir()
 
-Takes a single path to recursively empty  but not remove.
+Takes a single path to recursively empty but not remove.
 
-Returns false when there is a problem.
+Returns false when there is a problem. Also see L<DIAGNOSTICS>.
 
 =head2 File::Path::Tiny::mk_parent()
 
@@ -94,9 +94,15 @@ Like mk() but recursively creates the parent. e.g. given “foo/bar/baz.txt” c
 
 =head1 DIAGNOSTICS
 
-Throws no warnings or errors of its own
-
 If the functions ever return false, $! will have been set either explicitly or by the L<mkdir>(), L<rmdir>(), L<unlink>(), or L<opendir>() that ultimately returned false.
+
+=over 4
+
+=item C<< directory %s changed: expected dev=%d ino=$d, actual dev=%d ino=%d, aborting >>
+
+empty_dir() and rm() throw this if any of the directories being operated on change during the operation.
+
+=back
 
 =head1 MISC
 

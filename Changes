@@ -1,6 +1,7 @@
 Revision history for File-Path-Tiny
 
 0.9  ???
+    - Stop emptying/removing a path if it is changed out from underneath us
     - rt 96843: Add SEE ALSO section
 
 0.8  2016-01-26 14:44:57
