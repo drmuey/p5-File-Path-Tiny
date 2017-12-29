@@ -5,7 +5,7 @@ use warnings;
 use Cwd qw(cwd chdir);
 use Carp ();
 
-$File::Path::Tiny::VERSION = 0.8;
+$File::Path::Tiny::VERSION = 0.9;
 
 sub mk {
     my ( $path, $mask ) = @_;
