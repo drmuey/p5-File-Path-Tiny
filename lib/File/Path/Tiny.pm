@@ -65,7 +65,7 @@ sub empty_dir {
     require File::Spec if @contents;
     for my $thing (@contents) {
         my $long = File::Spec->catdir( $path, $thing );
-        if ( !-l $long && -d $long ) {
+        if ( !-l $long && -d _ ) {
             _bail_if_changed( $path, $orig_dev, $orig_ino );
             rm($long) or !-e $long or return;
         }

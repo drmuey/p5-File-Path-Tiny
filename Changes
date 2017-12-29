@@ -5,6 +5,7 @@ Revision history for File-Path-Tiny
     - Stop emptying/removing a path if it is changed out from underneath us
     - rt 96843: Add SEE ALSO section
     - prereq and unit test fixups
+    - Unit tests for symlink toggling protection
 
 0.8  2016-01-26 14:44:57
     - rt 88849: allow multiple processes to operate on the same paths (thanks HELENA!)
